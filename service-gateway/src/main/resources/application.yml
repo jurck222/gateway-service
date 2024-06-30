@@ -7,7 +7,7 @@ spring:
         add-to-simple-url-handler-mapping: true
         corsConfigurations:
             '[/**]':
-              allowedOrigins: "*"
+              allowedOrigins: "http://localhost:4200/"
               allowedHeaders:
                 - "Origin"
                 - "Content-Type"
@@ -17,7 +17,7 @@ spring:
               allowedMethods:
                 - POST
                 - GET
-                - OPTIONS
+                - DELETE
       routes:
         - id: availability-service
           uri: lb://availability-service
@@ -26,9 +26,6 @@ spring:
             - Method=GET
           filters:
             - AuthenticateFilter
-            - name: AuthorizeFilter
-              args:
-                configValue: PATIENT
 
         - id: availability-service
           uri: lb://availability-service
@@ -143,6 +140,22 @@ spring:
             - name: AuthorizeFilter
               args:
                 configValue: PATIENT
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/user/role
+            - Method=GET
+          filters:
+            - AuthenticateFilter
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/user/services
+            - Method=GET
+          filters:
+            - AuthenticateFilter
 
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin, RETAIN_FIRST
